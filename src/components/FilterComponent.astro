@@ -1,0 +1,159 @@
+---
+// FilterComponent.astro
+import { useState } from 'preact/hooks';
+
+export interface Props {
+  products: Array<any>;
+  categories: Array<string>;
+}
+
+const { products, categories } = Astro.props;
+const [filteredProducts, setFilteredProducts] = useState(products);
+const [selectedCategory, setSelectedCategory] = useState('');
+const [searchQuery, setSearchQuery] = useState('');
+
+function filterProducts() {
+  const filtered = products.filter(product =>
+    (selectedCategory === '' || product.category === selectedCategory) &&
+    (searchQuery === '' || product.title.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+  setFilteredProducts(filtered);
+}
+
+function handleCategoryChange(event) {
+  setSelectedCategory(event.target.value);
+  filterProducts();
+}
+
+function handleSearch(event) {
+  setSearchQuery(event.target.value);
+  filterProducts();
+}
+---
+
+<div class="filter-container">
+  <label for="category-filter">Filter by Category:</label>
+  <select id="category-filter" value={selectedCategory} onChange={handleCategoryChange}>
+    <option value="">All</option>
+    {categories.map(category => (
+      <option value={category}>{category}</option>
+    ))}
+  </select>
+
+  <input
+    type="text"
+    placeholder="Search books..."
+    class="search-input"
+    value={searchQuery}
+    onInput={handleSearch}
+  />
+</div>
+
+<div class="cards-container">
+  {filteredProducts.map(product => (
+    <div class="card">
+      <img src={product.img} alt={product.title} class="card-image" />
+      <h2 class="card-title">{product.title}</h2>
+      <p class="card-author">{product.author}</p>
+      <p class="card-stars">⭐ {product.stars}</p>
+      <p class="card-description">
+        {product.description.substring(0, 200)}
+        {product.description.length > 200 ? '...' : ''}
+      </p>
+      <p class="card-price">
+        {product.price ? `$${product.price.toFixed(2)}` : 'Price not available'}
+      </p>
+      <a href={`/product/${product.id}`} class="card-link">View More</a>
+    </div>
+  ))}
+</div>
+
+<style>
+  .filter-container {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .filter-container select,
+  .filter-container .search-input {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+  }
+
+  .cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    width: 100%;
+  }
+
+  .card {
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .card-title {
+    font-size: 1.4rem;
+    margin: 10px;
+    color: #333;
+    font-weight: bold;
+  }
+
+  .card-author {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+
+  .card-stars {
+    color: #f39c12;
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .card-description {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0 10px 15px;
+  }
+
+  .card-price {
+    font-weight: bold;
+    color: #27ae60;
+    margin-bottom: 15px;
+  }
+
+  .card-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #6200ea;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 0 10px 15px;
+    transition: background 0.3s;
+  }
+
+  .card-link:hover {
+    background: #3700b3;
+  }
+</style>

@@ -1,0 +1,92 @@
+---
+import { Astro } from 'astro';
+import products from '../../data/data.json';
+
+// `getStaticPaths` fonksiyonunu tanımla
+export async function getStaticPaths() {
+  const paths = products.map(product => ({
+    params: { id: product.id.toString() }
+  }));
+
+  return paths;
+}
+
+const { id } = Astro.params;
+
+const product = products.find(p => p.id === Number(id));
+
+if (!product) {
+  throw new Error('Product not found');
+}
+---
+
+<div class="detail-container">
+  <div class="detail-card">
+    <h1>{product.title}</h1>
+    <img src={product.img} alt={product.title} />
+    <p><strong>Author:</strong> {product.author}</p>
+    <p><strong>Stars:</strong> ⭐ {product.stars}</p>
+    <p><strong>Price:</strong> ${product.price.toFixed(2)}</p>
+    <p><strong>Category:</strong> {product.category}</p>
+    <p><strong>Publisher:</strong> {product.publisher}</p>
+    <p><strong>ISBN:</strong> {product.isbn}</p>
+    <p><strong>Description:</strong> {product.description}</p>
+    <a href="/" class="back-link">Back to Product List</a>
+  </div>
+</div>
+
+<style>
+  .detail-container {
+    display: flex;
+    justify-content: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  }
+
+  .detail-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 900px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #ffeb3b;
+    text-align: center;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 16px;
+    margin-bottom: 30px;
+  }
+
+  p {
+    margin: 15px 0;
+    font-size: 1.2rem;
+  }
+
+  .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #03a9f4, #6200ea);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+  }
+
+  .back-link:hover {
+    background: linear-gradient(135deg, #6200ea, #03a9f4);
+  }
+</style>
